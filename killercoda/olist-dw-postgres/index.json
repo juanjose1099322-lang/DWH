@@ -1,0 +1,20 @@
+{
+  "title": "Bodega Olist en PostgreSQL: conexión y cubos ROLAP",
+  "description": "Laboratorio del Corte 2: instalar PostgreSQL, conectarse con cadenas estándar locales, cargar la estrella de Olist y consultar los cubos OLAP.",
+  "difficulty": "beginner",
+  "time": "20 minutes",
+  "details": {
+    "intro": {
+      "text": "intro.md",
+      "background": "background.sh"
+    },
+    "steps": [
+      { "title": "Verificar PostgreSQL y la cadena de conexión", "text": "step1.md" },
+      { "title": "Cargar la bodega con el ETL", "text": "step2.md" },
+      { "title": "Crear los cubos ROLAP", "text": "step3.md" },
+      { "title": "Operaciones OLAP y versionamiento", "text": "step4.md" }
+    ],
+    "finish": { "text": "finish.md" }
+  },
+  "backend": { "imageid": "ubuntu" }
+}
