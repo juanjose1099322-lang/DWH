@@ -24,6 +24,20 @@ HDFS_RAW=/olist/raw
 HDFS_MR=/olist/mr
 STREAMING=$(ls "${HADOOP_HOME}"/share/hadoop/tools/lib/hadoop-streaming-*.jar)
 mkdir -p "$OUT" "$EV"
+
+# Máquinas pequeñas (Killercoda tiene ≈2 GB): contenedores de 256 MB y un solo reducer,
+# para que los cinco demonios de Hadoop y las tareas quepan en la memoria física.
+TOTAL_MB=$(free -m | awk '/Mem:/{print $2}')
+if [ "$TOTAL_MB" -lt 3500 ]; then
+  REDUCES=1
+  MEM_OPTS=(-D mapreduce.map.memory.mb=256 -D mapreduce.map.java.opts=-Xmx200m
+            -D mapreduce.reduce.memory.mb=256 -D mapreduce.reduce.java.opts=-Xmx200m
+            -D yarn.app.mapreduce.am.resource.mb=384 -D yarn.app.mapreduce.am.command-opts=-Xmx300m)
+  echo "Memoria de ${TOTAL_MB} MB: modo liviano (contenedores de 256 MB, 1 reducer)"
+else
+  REDUCES=2
+  MEM_OPTS=()
+fi
 : > "$EV/tiempos_yarn.tsv"
 
 seccion() { echo; echo "=================== $* ==================="; }
@@ -59,7 +73,7 @@ lanzar() {
   local files="$MR/texto_pt.py,$MR/${reducer%% *}"
   [ "$mapper" != "cat" ] && files="$files,$MR/${mapper%% *}"
   [ -n "$extra" ] && files="$files,$extra"
-  local args=(-D mapreduce.job.name="olist-$nombre" -D mapreduce.job.reduces=2
+  local args=(-D mapreduce.job.name="olist-$nombre" -D mapreduce.job.reduces=$REDUCES "${MEM_OPTS[@]}"
               -files "$files" -cmdenv PYTHONIOENCODING=utf-8 -input "$entradas" -output "$HDFS_MR/$nombre"
               -reducer "python3 $reducer")
   if [ "$mapper" = "cat" ]; then args+=(-mapper cat); else args+=(-mapper "python3 $mapper"); fi
