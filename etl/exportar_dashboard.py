@@ -85,6 +85,46 @@ for a in ANIOS:
             "cuotas_por_valor": [[v[3:], R(p)] for v, p in cuotas],
         }
 
+# ---------------------------------------------------------------------------------
+# Corte 3: resultados de MapReduce ingestados en la bodega (tablas mr_*).
+# Si todavía no se han corrido los jobs, el tablero se genera sin esta sección.
+# ---------------------------------------------------------------------------------
+tablas = {r[0] for r in q("SELECT table_name FROM information_schema.tables")}
+if {"mr_temas_resenas", "mr_distancia_bandas", "mr_terminos_sentimiento",
+    "mr_clasificador_nb"} <= tablas:
+    R = lambda x, n=1: None if x is None else round(float(x), n)
+    temas = q("""SELECT tema, resenas, pct_pedidos_tardios, score_prom, pct_negativas
+                 FROM mr_temas_resenas WHERE tema <> 'sin_tema' ORDER BY resenas DESC""")
+    bandas = q("""SELECT banda, envios, km_prom, dias_prom, pct_tardio, score_prom, flete_pct, r_pearson
+                  FROM mr_distancia_bandas ORDER BY orden""")
+    rutas = q("""SELECT estado_vendedor || ' → ' || estado_cliente, envios, km_prom, dias_prom,
+                        dias_esperados, exceso_dias, pct_tardio
+                 FROM vw_rutas_enriquecidas WHERE envios >= 100
+                 ORDER BY exceso_dias DESC LIMIT 8""")
+    recta = q("SELECT pendiente, intercepto FROM mr_distancia_bandas WHERE banda = 'Total'")[0]
+    neg = q("""SELECT termino, n_neg, n_pos FROM mr_terminos_sentimiento
+               WHERE n_neg + n_pos >= 50 ORDER BY z_neg DESC LIMIT 12""")
+    pos = q("""SELECT termino, n_neg, n_pos FROM mr_terminos_sentimiento
+               WHERE n_neg + n_pos >= 50 ORDER BY z_neg ASC LIMIT 12""")
+    conf = {(a, b): n for a, b, n in q("SELECT clase_real, clase_predicha, n FROM mr_clasificador_nb")}
+    tot = sum(conf.values())
+    ok = sum(n for (a, b), n in conf.items() if a == b)
+    tp = conf.get(("NEG", "NEG"), 0)
+    pred_neg = sum(n for (a, b), n in conf.items() if b == "NEG")
+    real_neg = sum(n for (a, b), n in conf.items() if a == "NEG")
+    out["bigdata"] = {
+        "temas": [[t, n, R(pt), R(s, 2), R(pn)] for t, n, pt, s, pn in temas],
+        "bandas": [[b, n, R(k, 0), R(d), R(t), R(s, 2), R(f), R(r, 3)] for b, n, k, d, t, s, f, r in bandas],
+        "rutas": [[ru, n, R(k, 0), R(d), R(e), R(x), R(t)] for ru, n, k, d, e, x, t in rutas],
+        "recta": {"dias_por_1000km": R(1000 * recta[0], 2), "intercepto": R(recta[1], 2)},
+        "terminos_neg": [[t.replace("_", " "), a, b] for t, a, b in neg],
+        "terminos_pos": [[t.replace("_", " "), a, b] for t, a, b in pos],
+        "clasificador": {"exactitud": R(100 * ok / tot), "precision_neg": R(100 * tp / pred_neg),
+                         "recall_neg": R(100 * tp / real_neg), "resenas_prueba": tot,
+                         "matriz": [[a, b, n] for (a, b), n in sorted(conf.items())]},
+    }
+    print("OK sección Big Data (Corte 3) incluida en el tablero")
+
 destino = ROOT / "dashboard" / "data.json"
 destino.parent.mkdir(exist_ok=True)
 destino.write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")

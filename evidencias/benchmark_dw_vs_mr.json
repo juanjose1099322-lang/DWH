@@ -1,0 +1,47 @@
+[
+ {
+  "factor": 1,
+  "resenas_mb": 6.2,
+  "geo_mb": 58.4,
+  "filas_resenas": 42687,
+  "filas_geo": 1000163,
+  "t1_sql_s": 0.46,
+  "t1_mr_s": 2.34,
+  "t1_terminos_sql": 9092,
+  "t1_terminos_mr": 9094,
+  "t2_sql_s": 0.19,
+  "t2_mr_s": 3.89,
+  "t2_ceps_sql": 19010,
+  "t2_ceps_mr": 19010
+ },
+ {
+  "factor": 5,
+  "resenas_mb": 31.3,
+  "geo_mb": 292.2,
+  "filas_resenas": 213435,
+  "filas_geo": 5000815,
+  "t1_sql_s": 1.05,
+  "t1_mr_s": 9.62,
+  "t1_terminos_sql": 125516,
+  "t1_terminos_mr": 125546,
+  "t2_sql_s": 0.57,
+  "t2_mr_s": 18.89,
+  "t2_ceps_sql": 19010,
+  "t2_ceps_mr": 19010
+ },
+ {
+  "factor": 20,
+  "resenas_mb": 125.5,
+  "geo_mb": 1168.7,
+  "filas_resenas": 853740,
+  "filas_geo": 20003260,
+  "t1_sql_s": 3.89,
+  "t1_mr_s": 37.56,
+  "t1_terminos_sql": 125516,
+  "t1_terminos_mr": 125546,
+  "t2_sql_s": 2.0,
+  "t2_mr_s": 72.89,
+  "t2_ceps_sql": 19010,
+  "t2_ceps_mr": 19010
+ }
+]

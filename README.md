@@ -6,8 +6,8 @@ Bodega de datos en esquema estrella sobre el *Brazilian E-Commerce Public Datase
 | Corte | Contenido | Estado |
 |---|---|---|
 | 1 | Contexto, modelo dimensional, diseño ETL | Entregado |
-| 2 | ETL implementado, cubos ROLAP, tablero gerencial, laboratorios Colab y Killercoda | Este repositorio |
-| 3 | Procesamiento distribuido (MapReduce / Spark) | Pendiente |
+| 2 | ETL implementado, cubos ROLAP, tablero gerencial, laboratorios Colab y Killercoda | Entregado |
+| 3 | Hadoop (HDFS + YARN), 6 jobs MapReduce, minería de texto, integración con la bodega y el tablero | Este repositorio |
 
 ## Estructura
 
@@ -44,6 +44,41 @@ python etl/exportar_dashboard.py             # tablero en dashboard/index.html
 
 Para PostgreSQL local: `bash scripts/setup_postgres.sh` y en `config/.env` activa
 `DW_URL=postgresql+psycopg2://dw_user:dw_pass@localhost:5432/olist_dw`.
+
+## Corte 3 · MapReduce sobre Hadoop
+
+```
+DWH/
+├── scripts/setup_hadoop.sh         # Hadoop 3.3.6 pseudo-distribuido (HDFS + YARN) en Ubuntu/Colab
+├── mapreduce/
+│   ├── preparar_insumos.py         # reseñas (texto crudo) + entregas (desde la bodega) + geolocalización
+│   ├── texto_pt.py                 # normalización, stopwords, léxico de temas (se envía con -files)
+│   ├── job1_mapper.py / job1_reducer.py     # términos por sentimiento (modelo Naive Bayes)
+│   ├── job2_mapper.py / job2_reducer.py     # reduce-side join reseñas ⋈ entregas + temas
+│   ├── job2b_reducer.py                     # agregación por tema (mapper = cat)
+│   ├── job3a_mapper.py / job3a_reducer.py   # centroides de 1 M de puntos (combiner)
+│   ├── job3b_mapper.py / job3b_reducer.py   # map-side join + distancia haversine
+│   ├── job4_mapper.py / job4_reducer.py     # clasificador NB + matriz de confusión
+│   ├── run_hadoop.sh               # corre todo en YARN y guarda evidencias/
+│   ├── run_local.py                # emulador de Hadoop Streaming (validación sin clúster)
+│   ├── verificar_salidas.py        # compara las salidas con esperado.json
+│   ├── cargar_resultados_dw.py     # salidas MR -> tablas mr_* de la bodega
+│   └── benchmark_dw_vs_mr.py       # contraste de rendimiento DuckDB vs MapReduce
+├── notebooks/Corte3_MapReduce_Colab.ipynb
+├── killercoda/olist-hadoop-mapreduce/
+└── evidencias/                     # logs HDFS/YARN, tiempos, benchmark
+```
+
+```bash
+sudo bash scripts/setup_hadoop.sh && source /etc/profile.d/hadoop.sh
+python mapreduce/preparar_insumos.py
+bash mapreduce/run_hadoop.sh                 # 6 jobs en YARN + evidencias
+python mapreduce/cargar_resultados_dw.py     # integra con la bodega
+python etl/exportar_dashboard.py             # tablero con la sección Big Data
+```
+
+Sin clúster: `python mapreduce/run_local.py` ejecuta los mismos scripts con el emulador local.
+Cadena estándar local de HDFS: `hdfs://localhost:9000` · UIs: NameNode `:9870`, ResourceManager `:8088`, JobHistory `:19888`.
 
 ## Cadenas de conexión estándar locales
 
