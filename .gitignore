@@ -1,0 +1,7 @@
+data/
+config/.env
+.venv/
+__pycache__/
+*.pyc
+mapreduce/modelo_nb.tsv
+mapreduce/centroides.tsv

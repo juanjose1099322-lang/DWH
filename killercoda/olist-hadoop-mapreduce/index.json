@@ -1,0 +1,17 @@
+{
+  "title": "Olist en Hadoop: HDFS, YARN y MapReduce",
+  "description": "Laboratorio del Corte 3: Hadoop pseudo-distribuido, carga en HDFS, seis jobs MapReduce (Hadoop Streaming en Python) monitoreados en YARN e integración de resultados con la bodega y el tablero.",
+  "difficulty": "intermediate",
+  "time": "30 minutes",
+  "details": {
+    "intro": { "text": "intro.md", "background": "background.sh" },
+    "steps": [
+      { "title": "Verificar los demonios de HDFS y YARN", "text": "step1.md" },
+      { "title": "Cargar los datos en HDFS", "text": "step2.md" },
+      { "title": "Ejecutar los jobs MapReduce en YARN", "text": "step3.md" },
+      { "title": "Leer resultados e integrarlos con la bodega", "text": "step4.md" }
+    ],
+    "finish": { "text": "finish.md" }
+  },
+  "backend": { "imageid": "ubuntu" }
+}

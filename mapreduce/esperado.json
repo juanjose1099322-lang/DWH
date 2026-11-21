@@ -1,0 +1,106 @@
+{
+ "job1_terminos": {
+  "filas": 7545,
+  "sumas": {
+   "1": 108276.0,
+   "2": 30905.0,
+   "3": 185298.0,
+   "4": 324479.0
+  },
+  "claves_muestra": [
+   "110v|7",
+   "127v|6",
+   "12v|3",
+   "zero_nao|5",
+   "zero|26",
+   "ziper|8"
+  ]
+ },
+ "job2a_join": {
+  "filas": 51459,
+  "sumas": {
+   "2": 190064.0
+  },
+  "claves_muestra": [
+   "atencion_cliente|A_TIEMPO",
+   "atencion_cliente|A_TIEMPO",
+   "atencion_cliente|A_TIEMPO",
+   "sin_tema|TARDE",
+   "sin_tema|TARDE",
+   "sin_tema|TARDE"
+  ]
+ },
+ "job2b_temas": {
+  "filas": 8,
+  "sumas": {
+   "1": 51459.0,
+   "2": 90.1,
+   "3": 23.38,
+   "4": 16.74,
+   "5": 24.75,
+   "6": 365.7
+  },
+  "claves_muestra": [
+   "atencion_cliente|2860",
+   "elogio_entrega|9070",
+   "elogio_producto|14610",
+   "producto_defecto|1179",
+   "producto_diferente|1356",
+   "sin_tema|14235"
+  ]
+ },
+ "job3a_centroides": {
+  "filas": 19010,
+  "sumas": {
+   "0": 811832174.0,
+   "1": -362665.703,
+   "2": -875945.295,
+   "3": 1000121.0
+  },
+  "claves_muestra": [
+   "01001|-23.550190",
+   "01002|-23.548146",
+   "01003|-23.548994",
+   "99970|-28.343766",
+   "99980|-28.389129",
+   "99990|-28.329595"
+  ]
+ },
+ "job3b_distancias": {
+  "filas": 418,
+  "sumas": {
+   "2": 291975.0,
+   "3": 633913.8,
+   "4": 7201.9,
+   "5": 2916.26,
+   "6": 1723.385,
+   "7": 10085.38,
+   "8": 9994.79,
+   "9": 0.393,
+   "10": 0.006,
+   "11": 8.241
+  },
+  "claves_muestra": [
+   "BANDA|01|0-100 km",
+   "BANDA|02|100-300 km",
+   "BANDA|03|300-700 km",
+   "RUTA|SP>SE",
+   "RUTA|SP>SP",
+   "RUTA|SP>TO"
+  ]
+ },
+ "job4_clasificar": {
+  "filas": 9,
+  "sumas": {
+   "2": 8439.0
+  },
+  "claves_muestra": [
+   "NEG|NEG",
+   "NEG|NEU",
+   "NEG|POS",
+   "POS|NEG",
+   "POS|NEU",
+   "POS|POS"
+  ]
+ }
+}

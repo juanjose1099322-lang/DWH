@@ -1,0 +1,73 @@
+[
+  {
+    "job": "job1_terminos",
+    "maps": 4,
+    "registros_entrada": 42687,
+    "registros_tras_combiner": 163878,
+    "registros_salida": 7545,
+    "seg_map": 1.49,
+    "seg_total": 1.67,
+    "contadores": {
+      "Job1.ResenasEntrenamiento": 34248
+    }
+  },
+  {
+    "job": "job2a_join",
+    "maps": 8,
+    "registros_entrada": 140498,
+    "registros_tras_combiner": 140498,
+    "registros_salida": 51459,
+    "seg_map": 0.92,
+    "seg_total": 1.48,
+    "contadores": {
+      "Job2.PedidosConResena_A_TIEMPO": 36800,
+      "Job2.PedidosConResena_ND": 1904,
+      "Job2.PedidosConResena_TARDE": 3836
+    }
+  },
+  {
+    "job": "job2b_temas",
+    "maps": 4,
+    "registros_entrada": 51459,
+    "registros_tras_combiner": 51459,
+    "registros_salida": 8,
+    "seg_map": 0.02,
+    "seg_total": 0.06,
+    "contadores": {}
+  },
+  {
+    "job": "job3a_centroides",
+    "maps": 4,
+    "registros_entrada": 1000164,
+    "registros_tras_combiner": 19079,
+    "registros_salida": 19010,
+    "seg_map": 3.59,
+    "seg_total": 3.79,
+    "contadores": {
+      "Job3a.PuntosFueraDeBrasil": 42
+    }
+  },
+  {
+    "job": "job3b_distancias",
+    "maps": 4,
+    "registros_entrada": 97811,
+    "registros_tras_combiner": 1254,
+    "registros_salida": 418,
+    "seg_map": 1.66,
+    "seg_total": 1.73,
+    "contadores": {
+      "Job3b.EnviosGeorreferenciados": 97325,
+      "Job3b.SinCoordenadas": 486
+    }
+  },
+  {
+    "job": "job4_clasificar",
+    "maps": 4,
+    "registros_entrada": 42687,
+    "registros_tras_combiner": 8439,
+    "registros_salida": 9,
+    "seg_map": 0.2,
+    "seg_total": 0.23,
+    "contadores": {}
+  }
+]

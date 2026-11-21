@@ -69,7 +69,19 @@ td:first-child{font-family:var(--f-body);font-weight:500}
 .bar-cell i{display:block;height:6px;border-radius:3px;background:var(--accent);opacity:.85}
 footer{margin-top:20px;font-size:12px;color:var(--ink-3);display:grid;gap:6px;max-width:80ch}
 footer b{color:var(--ink-2)}
-@media (max-width:820px){.grid{grid-template-columns:minmax(0,1fr)}.chart{height:230px}h1{font-size:19px}}
+.sec-head{margin:28px 0 0;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;border-top:1px solid var(--line);padding-top:18px}
+.sec-head h2{font-size:18px;font-weight:700;margin:0;letter-spacing:-.01em}
+.sec-head p{margin:0;color:var(--ink-3);font-size:12px;max-width:80ch}
+.badge{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-2);border:1px solid var(--accent-2);border-radius:999px;padding:2px 8px}
+.terms{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.terms h3{font-size:12px;margin:0 0 6px;color:var(--ink-2);font-weight:600}
+.confm td,.confm th{text-align:center}
+.confm td.hit{background:var(--accent-soft);color:var(--ink);font-weight:600}
+.minis{display:flex;flex-wrap:wrap;gap:8px 22px}
+.minis div{display:flex;flex-direction:column}
+.minis b{font-family:var(--f-data);font-size:20px;font-weight:500}
+.minis span{font-size:12px;color:var(--ink-3)}
+@media (max-width:820px){.terms{grid-template-columns:1fr}.grid{grid-template-columns:minmax(0,1fr)}.chart{height:230px}h1{font-size:19px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 
@@ -77,7 +89,7 @@ footer b{color:var(--ink-2)}
   <header class="top">
     <div class="top-row">
       <div>
-        <div class="eyebrow">Olist · Bodega de datos · Corte 2</div>
+        <div class="eyebrow">Olist · Bodega de datos + Big Data · Cortes 2 y 3</div>
         <h1>Tablero Gerencial de Ventas y Logística</h1>
       </div>
       <div class="filters">
@@ -142,8 +154,50 @@ footer b{color:var(--ink-2)}
     </article>
   </section>
 
+  <section id="bigdata" hidden>
+    <div class="sec-head">
+      <span class="badge">Corte 3 · MapReduce</span>
+      <h2>Voz del cliente y distancia real</h2>
+      <p>Salidas de los jobs MapReduce sobre HDFS (texto libre de 42.687 reseñas y 1.000.163 puntos de geolocalización), ingestadas de vuelta en la bodega. Es un procesamiento batch sobre todo el histórico: los filtros de año y región no aplican a esta sección.</p>
+    </div>
+    <section class="grid">
+      <article class="panel">
+        <h2>¿De qué se quejan los clientes?</h2>
+        <p class="q">Job 2 · Reseñas por tema detectado en el texto (léxico en portugués) · color = % de reseñas negativas (1-2 ★)</p>
+        <div class="chart"><canvas id="c-temas" role="img" aria-label="Barras horizontales de reseñas por tema"></canvas></div>
+        <div class="action" id="a-temas"></div>
+      </article>
+      <article class="panel">
+        <h2>La distancia real explica el retraso</h2>
+        <p class="q">Job 3 · % de entregas tardías y días promedio por banda de distancia vendedor → cliente (haversine)</p>
+        <div class="chart"><canvas id="c-bandas" role="img" aria-label="Barras de entregas tardías por banda de distancia con línea de días"></canvas></div>
+        <div class="action" id="a-bandas"></div>
+      </article>
+      <article class="panel">
+        <h2>Rutas lentas para su distancia</h2>
+        <p class="q">Job 3 · Días reales frente a los esperados para su distancia (rutas con 100+ envíos)</p>
+        <div class="tbl-wrap"><table id="t-rutas-km"></table></div>
+        <div class="action" id="a-rutas-km"></div>
+      </article>
+      <article class="panel">
+        <h2>Palabras que anticipan una mala reseña</h2>
+        <p class="q">Job 1 · Términos con mayor asociación (log-odds) a reseñas negativas y positivas</p>
+        <div class="terms"><div><h3>Asociados a 1-2 ★</h3><table id="t-neg"></table></div><div><h3>Asociados a 4-5 ★</h3><table id="t-pos"></table></div></div>
+        <div class="action" id="a-terms"></div>
+      </article>
+      <article class="panel wide">
+        <h2>Clasificador automático de reseñas (Naive Bayes entrenado con MapReduce)</h2>
+        <p class="q">Jobs 1 y 4 · Entrenado con el 80 % de las reseñas y evaluado con el 20 % restante</p>
+        <div class="minis" id="m-nb"></div>
+        <div class="tbl-wrap"><table class="confm" id="t-conf"></table></div>
+        <div class="action" id="a-nb"></div>
+      </article>
+    </section>
+  </section>
+
   <footer>
     <div><b>Fuente:</b> Brazilian E-Commerce Public Dataset by Olist (Kaggle), 2016-2018. Cifras calculadas sobre los cubos ROLAP de la bodega (vista <code>vw_cubo_base</code>).</div>
+    <div><b>Corte 3:</b> la sección «Voz del cliente y distancia real» sale de los jobs MapReduce (Hadoop Streaming) cuyas salidas se cargan en las tablas <code>mr_*</code> de la bodega con <code>mapreduce/cargar_resultados_dw.py</code>.</div>
     <div><b>Definiciones:</b> ingreso neto = precio de los productos sin flete · ticket = (producto + flete) ÷ pedidos · entrega tardía = fecha real posterior a la estimada · los indicadores de entrega y calificación usan solo pedidos entregados. La serie mensual muestra ene-2017 a ago-2018 (2016 y sep-2018 tienen muy pocos pedidos).</div>
   </footer>
 </div>
@@ -281,7 +335,57 @@ function render(){
   document.getElementById('t-pagos').innerHTML = `<thead><tr><th>Medio de pago</th><th>Pedidos</th><th>Participación</th><th>★</th></tr></thead><tbody>` +
     p.map(x=>`<tr><td>${x[0]}</td><td>${nf0.format(x[1])}</td><td><span class="bar-cell"><i style="width:${Math.round(x[1]/totP*80)}px"></i>${nf1.format(x[1]/totP*100)} %</span></td><td>${nf2.format(x[2])}</td></tr>`).join('') + '</tbody>';
   const sc = p.map(x=>x[2]), rng = Math.max(...sc)-Math.min(...sc);
+  renderBig();
   document.getElementById('a-pagos').innerHTML = `<span class="tag">Lectura</span>La tarjeta de crédito domina con ${nf1.format(p[0][1]/totP*100)} %. La calificación varía solo ${nf2.format(rng)} puntos entre medios de pago: <b>el medio de pago no explica la satisfacción</b>; la entrega sí.`;
+}
+
+
+const TEMA = {entrega_atraso:'Retraso o no entrega',elogio_producto:'Elogio al producto',elogio_entrega:'Elogio a la entrega',atencion_cliente:'Atención y reembolsos',pedido_incompleto:'Pedido incompleto',producto_diferente:'Producto distinto al pedido',producto_defecto:'Producto defectuoso'};
+const CL = {NEG:'Negativa',NEU:'Neutra',POS:'Positiva'};
+function renderBig(){
+  const B = D.bigdata; if(!B) return;
+  document.getElementById('bigdata').hidden = false;
+  const accent = css('--accent'), bad = css('--bad'), warn = css('--warn'), good = css('--good');
+  // Temas
+  const t = B.temas;
+  const o = baseOpts(); o.indexAxis='y';
+  o.scales.x = {grid:{color:css('--grid')},border:{display:false},ticks:{color:css('--ink-2'),maxTicksLimit:5}};
+  o.scales.y = {grid:{display:false},border:{color:css('--line')},ticks:{color:css('--ink-2')}};
+  o.plugins.tooltip.callbacks = {label: x => [nf0.format(x.raw)+' reseñas', nf1.format(t[x.dataIndex][4])+' % negativas', nf2.format(t[x.dataIndex][3])+' ★ promedio']};
+  chart('c-temas',{type:'bar',data:{labels:t.map(x=>TEMA[x[0]]||x[0]),datasets:[{data:t.map(x=>x[1]),
+    backgroundColor:t.map(x=>x[4]>=50?bad:x[4]>=20?warn:accent),borderRadius:4,borderSkipped:'start',maxBarThickness:18}]},options:o});
+  const at = t.find(x=>x[0]==='entrega_atraso');
+  document.getElementById('a-temas').innerHTML = at ? `<span class="tag">Acción</span><b>${nf0.format(at[1])}</b> reseñas hablan de retraso o de no recibir el pedido (${nf1.format(at[4])} % negativas), y el <b>${nf1.format(100-at[2])} %</b> de esos pedidos figura en la bodega como entregado a tiempo: el cliente percibe retraso aunque se cumpla la fecha estimada. Acortar y comunicar mejor la promesa de entrega.` : '';
+  // Bandas
+  const b = B.bandas.filter(x=>x[0]!=='Total'), g = B.bandas.find(x=>x[0]==='Total');
+  const ob = baseOpts();
+  ob.scales.y = {position:'left',grid:{color:css('--grid')},border:{display:false},ticks:{color:css('--ink-2'),callback:v=>v+' %'},min:0};
+  ob.scales.y2 = {position:'right',grid:{display:false},border:{display:false},ticks:{color:css('--ink-2'),callback:v=>v+' d'},min:0};
+  ob.scales.x.ticks = {color:css('--ink-2'),maxRotation:0,autoSkip:false,callback:function(v){return this.getLabelForValue(v).replace(' km','')}};
+  ob.plugins.legend = {display:true,position:'bottom',labels:{boxWidth:10,boxHeight:10,color:css('--ink-2')}};
+  ob.plugins.tooltip.callbacks = {label: x => x.datasetIndex===0 ? nf1.format(x.raw)+' % tardías · '+nf0.format(b[x.dataIndex][1])+' envíos' : nf1.format(x.raw)+' días promedio'};
+  chart('c-bandas',{data:{labels:b.map(x=>x[0]),datasets:[
+    {type:'bar',label:'% entregas tardías',data:b.map(x=>x[4]),backgroundColor:b.map(x=>x[4]>8?bad:accent),borderRadius:4,borderSkipped:'start',maxBarThickness:42,yAxisID:'y'},
+    {type:'line',label:'Días de entrega',data:b.map(x=>x[3]),borderColor:css('--ink-2'),borderWidth:2,pointRadius:3,pointBackgroundColor:css('--ink-2'),tension:.2,yAxisID:'y2'}]},options:ob});
+  document.getElementById('a-bandas').innerHTML = `<span class="tag">Acción</span>Más allá de 1.200 km las entregas tardías suben a <b>${nf1.format(b[4][4])}-${nf1.format(b[5][4])} %</b> (frente a ${nf1.format(b[0][4])} % en envíos de menos de 100 km) y el flete llega al ${nf1.format(b[5][6])} % del producto. Correlación distancia-días: r = ${nf2.format(g[7])}. Usar la distancia real para calcular la fecha estimada y priorizar vendedores cercanos.`;
+  // Rutas: días reales vs. esperados por distancia
+  const r = B.rutas, maxR = Math.max(...r.map(x=>x[5]),1);
+  document.getElementById('t-rutas-km').innerHTML = `<thead><tr><th>Ruta</th><th>Envíos</th><th>Km</th><th>Días reales</th><th>Esperados</th><th>Exceso</th><th>% tardías</th></tr></thead><tbody>` +
+    r.map(x=>`<tr><td>${x[0]}</td><td>${nf0.format(x[1])}</td><td>${nf0.format(x[2])}</td><td>${nf1.format(x[3])}</td><td>${nf1.format(x[4])}</td><td><span class="bar-cell"><i style="width:${Math.round(x[5]/maxR*50)}px;background:${bad}"></i>+${nf1.format(x[5])}</span></td><td>${nf1.format(x[6])}</td></tr>`).join('') + '</tbody>';
+  document.getElementById('a-rutas-km').innerHTML = r.length ? `<span class="tag">Acción</span>Según la recta del Job 3 (${nf1.format(B.recta.intercepto)} días fijos + ${nf1.format(B.recta.dias_por_1000km)} días por cada 1.000 km), <b>${r[0][0]}</b> tarda ${nf1.format(r[0][5])} días más de lo que su distancia justifica. Estas rutas no siempre eran las más tardías del cubo: el problema es el operador, no la distancia. Renegociar o cambiar de transportadora en ellas.` : '';
+  // Términos
+  const tt = (rows, cls) => `<thead><tr><th>Término</th><th>1-2 ★</th><th>4-5 ★</th></tr></thead><tbody>` + rows.map(x=>`<tr><td>${x[0]}</td><td>${nf0.format(x[1])}</td><td>${nf0.format(x[2])}</td></tr>`).join('') + '</tbody>';
+  document.getElementById('t-neg').innerHTML = tt(B.terminos_neg.slice(0,10));
+  document.getElementById('t-pos').innerHTML = tt(B.terminos_pos.slice(0,10));
+  document.getElementById('a-terms').innerHTML = `<span class="tag">Lectura</span>Las reseñas negativas giran en torno a <b>no recibir</b> («não recebi», «não chegou», «aguardando») y a pedir contacto; las positivas, en torno a <b>llegar antes del plazo</b>. El lenguaje del cliente confirma que la entrega, no el precio, es la palanca de la satisfacción.`;
+  // Clasificador
+  const k = B.clasificador;
+  document.getElementById('m-nb').innerHTML = [['Exactitud',nf1.format(k.exactitud)+' %'],['Precisión en negativas',nf1.format(k.precision_neg)+' %'],['Cobertura (recall) en negativas',nf1.format(k.recall_neg)+' %'],['Reseñas de prueba',nf0.format(k.resenas_prueba)]]
+    .map(([l,v])=>`<div><b>${v}</b><span>${l}</span></div>`).join('');
+  const C3 = ['NEG','NEU','POS'], M = {}; k.matriz.forEach(([a,p,n])=>M[a+p]=n);
+  document.getElementById('t-conf').innerHTML = `<thead><tr><th>Real \\ Predicha</th>${C3.map(c=>`<th>${CL[c]}</th>`).join('')}</tr></thead><tbody>` +
+    C3.map(a=>`<tr><td>${CL[a]}</td>${C3.map(p=>`<td class="${a===p?'hit':''}">${nf0.format(M[a+p]||0)}</td>`).join('')}</tr>`).join('') + '</tbody>';
+  document.getElementById('a-nb').innerHTML = `<span class="tag">Acción</span>El modelo detecta ${nf1.format(k.recall_neg)} % de las reseñas negativas solo con el texto. Sirve para priorizar mensajes que llegan sin calificación (correo, chat, redes) y enviarlos de inmediato al área de servicio. La clase neutra es la más difícil (3 ★ mezcla elogios y quejas).`;
 }
 
 render();
