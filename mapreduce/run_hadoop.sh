@@ -27,12 +27,14 @@ mkdir -p "$OUT" "$EV"
 : > "$EV/tiempos_yarn.tsv"
 
 seccion() { echo; echo "=================== $* ==================="; }
+# Nota: "cmd | head" cierra la tubería antes de tiempo y el comando de la izquierda
+# termina con error (SIGPIPE). Por eso esas líneas llevan "|| true": solo muestran muestras.
 
 # ---------------------------------------------------------------- 1. HDFS: carga
 {
   seccion "Estado del clúster"
   jps | grep -v Jps
-  hdfs dfsadmin -report | head -20
+  hdfs dfsadmin -report | head -20 || true
   yarn node -list -all
 
   seccion "Carga a HDFS"
@@ -42,11 +44,11 @@ seccion() { echo; echo "=================== $* ==================="; }
   hdfs dfs -du -s -h "$HDFS_RAW"
 
   seccion "Bloques y réplicas (fsck)"
-  hdfs fsck "$HDFS_RAW/geolocalizacion.csv" -files -blocks -locations | head -25
+  hdfs fsck "$HDFS_RAW/geolocalizacion.csv" -files -blocks -locations | head -25 || true
 
   seccion "Lectura de muestra desde HDFS"
-  hdfs dfs -cat "$HDFS_RAW/resenas.tsv" | head -3
-  hdfs dfs -tail "$HDFS_RAW/entregas.tsv" | tail -2
+  hdfs dfs -cat "$HDFS_RAW/resenas.tsv" | head -3 || true
+  hdfs dfs -tail "$HDFS_RAW/entregas.tsv" | tail -2 || true
 } 2>&1 | tee "$EV/01_hdfs_carga.log"
 
 # ---------------------------------------------------------------- 2. YARN: jobs
