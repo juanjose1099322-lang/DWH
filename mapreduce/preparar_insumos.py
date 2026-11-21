@@ -63,6 +63,15 @@ with open(OUT / "entregas.tsv", "w", encoding="utf-8") as out:
         out.write("\t".join(["E"] + ["" if v is None else str(v) for v in r]) + "\n")
 print(f"entregas.tsv     {len(filas):>9,} pedido-vendedor entregados (desde la bodega)")
 
-# 3. Geolocalización: cruda
-shutil.copy(RAW / "olist_geolocation_dataset.csv", OUT / "geolocalizacion.csv")
+# 3. Geolocalización: cruda. El ETL del Corte 1 no la descarga (no entra en la estrella),
+#    así que se baja aquí desde el mismo espejo público de Olist si no está en data/raw/.
+GEO = RAW / "olist_geolocation_dataset.csv"
+if not GEO.exists():
+    import os
+    import urllib.request
+    base = os.getenv("RAW_BASE_URL",
+                     "https://raw.githubusercontent.com/olist/work-at-olist-data/master/datasets")
+    print("Descargando olist_geolocation_dataset.csv (≈60 MB)...")
+    urllib.request.urlretrieve(f"{base}/olist_geolocation_dataset.csv", GEO)
+shutil.copy(GEO, OUT / "geolocalizacion.csv")
 print(f"geolocalizacion  {sum(1 for _ in open(OUT / 'geolocalizacion.csv')) - 1:>9,} puntos (crudo)")
