@@ -13,10 +13,17 @@ echo "=== [1/6] Paquetes del sistema"
 apt-get update -qq
 DEBIAN_FRONTEND=noninteractive apt-get install -y -qq curl python3-venv python3-full >/dev/null
 
-echo "=== [2/6] Entorno virtual de Python"
-[ -d .venv ] || python3 -m venv .venv
-. .venv/bin/activate
-pip install -q -r requirements.txt
+echo "=== [2/6] Entorno de Python"
+# En Ubuntu (Killercoda/WSL) se usa un entorno virtual; en Google Colab no hace falta
+# (y venv falla por la versión de Python), así que se instala directo con pip.
+if [ -d /content ] || [ -n "${COLAB_RELEASE_TAG:-}" ]; then
+  rm -rf .venv
+  pip install -q -r requirements.txt
+else
+  [ -x .venv/bin/python ] || { rm -rf .venv; python3 -m venv .venv; }
+  . .venv/bin/activate
+  pip install -q -r requirements.txt
+fi
 [ -f config/.env ] || cp config/.env.example config/.env
 
 echo "=== [3/6] Bodega de datos (Cortes 1 y 2)"
