@@ -120,7 +120,8 @@ hdfs  --daemon start namenode        || true
 hdfs  --daemon start datanode        || true
 yarn  --daemon start resourcemanager || true
 yarn  --daemon start nodemanager     || true
-mapred --daemon start historyserver  || true
+# En máquinas de ~2 GB (Killercoda) el JobHistory Server no cabe junto a las tareas
+if [ "$TOTAL_MB" -ge 3500 ]; then mapred --daemon start historyserver || true; fi
 hdfs dfsadmin -safemode wait >/dev/null
 
 echo ">> [6/6] Verificación"
