@@ -11,7 +11,7 @@ cd "$(dirname "$0")/.."
 
 echo "=== [1/6] Paquetes del sistema"
 apt-get update -qq
-DEBIAN_FRONTEND=noninteractive apt-get install -y -qq curl python3-venv python3-full >/dev/null
+DEBIAN_FRONTEND=noninteractive apt-get install -y -qq curl python3-venv python3-full bsdextrautils >/dev/null
 
 echo "=== [2/6] Entorno de Python"
 # En Ubuntu (Killercoda/WSL) se usa un entorno virtual; en Google Colab no hace falta
